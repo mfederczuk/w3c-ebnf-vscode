@@ -1,7 +1,7 @@
 {
 	"name": "w3c-ebnf",
 	"displayName": "W3C EBNF",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "Language support for W3C's EBNF notation",
 	"categories": ["Programming Languages"],
 	"keywords": [

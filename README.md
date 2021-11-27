@@ -5,15 +5,10 @@
 
 # W3C's EBNF Notation for VSCode #
 
-[version_shield]: https://img.shields.io/badge/version-N%2FA_(in_development)-important.svg
-![version: N/A (in development)][version_shield]
-
-<!--
-[version_shield]: https://img.shields.io/badge/version-{{CURRENT_VERSION_NAME}}-informational.svg
-[release_page]: https://github.com/mfederczuk/w3c-ebnf-vscode/releases/tag/v{{CURRENT_VERSION_NAME}} "Release v{{CURRENT_VERSION_NAME}}"
-[![version: {{CURRENT_VERSION_NAME}}][version_shield]][release_page]
+[version_shield]: https://img.shields.io/badge/version-0.1.0-informational.svg
+[release_page]: https://github.com/mfederczuk/w3c-ebnf-vscode/releases/tag/v0.1.0 "Release v0.1.0"
+[![version: 0.1.0][version_shield]][release_page]
 [![Changelog](https://img.shields.io/badge/-Changelog-informational.svg)](CHANGELOG.md "Changelog")
--->
 
 ## About ##
 
