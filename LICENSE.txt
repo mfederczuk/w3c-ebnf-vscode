@@ -1,0 +1,7 @@
+This VSCode extension is licensed under:
+
+        Mozilla Public License 2.0 (LICENSES/MPL-2.0.txt)
+                AND
+        Apache License 2.0 (LICENSES/Apache-2.0.txt)
+
+For licensing of individual files see: 'COPYING.txt'

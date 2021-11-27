@@ -1,0 +1,39 @@
+All files should contain a SPDX short-form identifier to declare under which license they are published.
+A SPDX short-form identifier takes the form of:
+
+        SPDX-License-Identifier: <SPDX License Expression>
+
+Read more about SPDX short-form identifiers here: <https://spdx.dev/ids/>
+
+
+Files where a SPDX short-form identifier cannot be used or does not fit (for whatever reason) are listed here.
+The left hand side of the colon (':') is the path of the file or directory, and the right hand side of the colon is the
+SPDX license expression that the path is licensed under.
+If the path is a directory, then all files inside the directory are licensed under the expression recursively.
+
+        .github/issue_labels.json: CC0-1.0
+        .github/pull_request_template.md: CC0-1.0
+
+The SPDX short-form identifier inside distinct files have higher precedence than this list and will override the license
+expression when they differ.
+
+
+The individual licenses, used in this repository, can be found in the 'LICENSES' directory and are also listed here:
+
+        Full name:        Apache License 2.0
+        Short identifier: Apache-2.0
+        Text file:        LICENSES/Apache-2.0.txt
+
+        Full name:        Creative Commons Attribution Share Alike 4.0 International
+        Short identifier: CC-BY-SA-4.0
+        Text file:        LICENSES/CC-BY-SA-4.0.txt
+
+        Full name:        Creative Commons Zero v1.0 Universal
+        Short identifier: CC0-1.0
+        Text file:        LICENSES/CC0-1.0.txt
+
+        Full name:        Mozilla Public License 2.0
+        Short identifier: MPL-2.0
+        Text file:        LICENSES/MPL-2.0.txt
+
+Each of these files are verbatim copies from their original source. Copyright belongs to their respectful authors.
