@@ -1,0 +1,49 @@
+{
+	"name": "w3c-ebnf",
+	"displayName": "W3C EBNF",
+	"version": "0.0.1",
+	"description": "Language support for W3C's EBNF notation",
+	"categories": ["Programming Languages"],
+	"keywords": [
+		"w3c",
+		"ebnf",
+		"w3c ebnf"
+	],
+	"homepage": "https://github.com/mfederczuk/w3c-ebnf-vscode#readme",
+	"bugs": {
+		"url": "https://github.com/mfederczuk/w3c-ebnf-vscode/issues",
+		"email": "federczuk.michael@protonmail.com"
+	},
+	"license": "MLP-2.0 AND Apache-2.0",
+	"author": "Michael Federczuk <federczuk.michael@protonmail.com>",
+	"contributors": [
+		"Michael Federczuk <federczuk.michael@protonmail.com>"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mfederczuk/w3c-ebnf-vscode.git"
+	},
+	"engines": {
+		"vscode": "^1.62.0"
+	},
+	"contributes": {
+		"languages": [{
+			"id": "w3c-ebnf",
+			"aliases": [
+				"W3C EBNF",
+				"w3c-ebnf"
+			],
+			"extensions": [
+				".w3c-ebnf",
+				".ebnf",
+				".bnf"
+			],
+			"configuration": "language-configuration.json"
+		}],
+		"grammars": [{
+			"language": "w3c-ebnf",
+			"scopeName": "source.w3c-ebnf",
+			"path": "syntaxes/w3c-ebnf.tmLanguage.json"
+		}]
+	}
+}

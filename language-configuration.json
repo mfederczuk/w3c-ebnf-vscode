@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: CC0-1.0
+{
+	"comments": {
+		"lineComment": "//", // not official, but added anyway
+		"blockComment": ["/*", "*/"]
+	},
+	"brackets": [
+		["(", ")"]
+	],
+	"autoClosingPairs": [
+		["(",  ")"],
+		["[",  "]"],
+		["{",  "}"],
+		["\"", "\""],
+		["'",  "'"]
+	],
+	"autoCloseBefore": ";]) \n\t",
+	"surroundingPairs": [
+		["(",  ")"],
+		["[",  "]"],
+		["{",  "}"],
+		["\"", "\""],
+		["'",  "'"]
+	],
+	"folding": {
+		"markers": {
+			"start": "^\\s*(//\\s*#?region\\b|/\\*\\s*#?region\\b.*\\*/)",
+			"end": "^\\s*(//\\s*#?endregion\\b|/\\*\\s*#?endregion\\b.*\\*/)"
+		}
+	}
+}

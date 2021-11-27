@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: CC0-1.0
+
+.github/**
+.vscode-test/**
+.vscode/**
+
+.editorconfig
+.gitignore
+
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+DEVELOPING.md
+
+**/*.vsix
