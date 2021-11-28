@@ -1,0 +1,11 @@
+// SPDX-License-Identifier: CC0-1.0
+{
+	"breadcrumbs.enabled": false,
+	"editor.accessibilitySupport": "off",
+	"editor.cursorStyle": "underline-thin",
+	"editor.minimap.enabled": false,
+	"editor.renderLineHighlight": "none",
+	"editor.scrollbar.horizontal": "hidden",
+	"editor.scrollbar.vertical": "hidden",
+	"git.enabled": false
+}

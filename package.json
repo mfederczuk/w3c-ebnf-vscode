@@ -4,11 +4,16 @@
 	"version": "0.1.0",
 	"publisher": "mfederczuk",
 	"description": "Language support for W3C's EBNF notation",
-	"categories": ["Programming Languages"],
+	"categories": [
+		"Programming Languages",
+		"Snippets"
+	],
 	"keywords": [
-		"w3c",
 		"ebnf",
-		"w3c ebnf"
+		"bnf",
+		"w3c",
+		"w3c ebnf",
+		"w3c bnf"
 	],
 	"homepage": "https://github.com/mfederczuk/w3c-ebnf-vscode#readme",
 	"bugs": {
@@ -45,6 +50,10 @@
 			"language": "w3c-ebnf",
 			"scopeName": "source.w3c-ebnf",
 			"path": "syntaxes/w3c-ebnf.tmLanguage.json"
+		}],
+		"snippets": [{
+			"language": "w3c-ebnf",
+			"path": "snippets.code-snippets"
 		}]
 	}
 }

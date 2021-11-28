@@ -1,0 +1,145 @@
+#!/bin/bash
+# -*- sh -*-
+# vim: set syntax=sh
+# code: language=shellscript
+
+# SPDX-License-Identifier: MPL-2.0 AND Apache-2.0
+
+set -o errexit
+
+
+log() {
+	echo "$@" >&2
+}
+
+
+# region testing for required programs
+
+declare program
+
+for program in vsce jq git; do
+	if ! command -v "$program" > '/dev/null'; then
+		log "$0: $program: program missing"
+		exit 27
+	fi
+done
+
+unset -v program
+
+# endregion
+
+
+declare root_dir_path
+root_dir_path="$(dirname -- "$0")"
+root_dir_path="$(realpath --relative-to=. -s -- "$root_dir_path")"
+readonly root_dir_path
+
+declare package_json_file_path
+package_json_file_path="$(realpath --relative-to=. -s -- "$root_dir_path/package.json")"
+readonly package_json_file_path
+
+declare publisher
+publisher="$(jq -r '."publisher"' -- "$package_json_file_path")"
+readonly publisher
+
+
+# region checking if the correct publisher is logged in
+
+declare publisher_logged_in=false
+
+declare logged_in_publisher
+while read -r logged_in_publisher; do
+	if [ "$logged_in_publisher" = "$publisher" ]; then
+		publisher_logged_in=true
+		break
+	fi
+done < <(vsce ls-publishers)
+unset -v logged_in_publisher
+
+if ! $publisher_logged_in; then
+	log "$0: publisher '$publisher' is not logged in"
+	exit 48
+fi
+
+unset -v publisher_logged_in
+
+# endregion
+
+
+# region checking for dirty worktree
+
+declare dirty=false
+
+declare file_path
+while read -r; do
+	if [[ ! "$REPLY" =~ ^(..)' '(.*)$ ]]; then
+		log "$0: emergency stop: git status line did not match - something is wrong"
+		exit 123
+	fi
+
+	dirty=true
+	file_path="${BASH_REMATCH[2]}"
+
+	case "${BASH_REMATCH[1]}" in
+		'M'?|?'M')
+			log "'$file_path' has been modified."
+			;;
+		'??')
+			log "'$file_path' is untracked."
+			;;
+		'!!')
+			log "'$file_path' is ignored"
+			;;
+		*)
+			log "'$file_path' has been changed in some way"
+			;;
+	esac
+done < <(xargs git status --untracked-files=all --ignored=matching --porcelain=v1 -- < <(vsce ls))
+unset -v REPLY file_path
+
+
+if $dirty; then
+	log "$0: worktree is dirty, aborting publishing"
+	exit 49
+fi
+
+# endregion
+
+
+# region checking git tag and package.json version
+
+declare tag_name
+tag_name=$(git name-rev --tags --refs='v*' --name-only -- HEAD)
+readonly tag_name
+
+if [ "$tag_name" = 'undefined' ]; then
+	log "$0: no Git tag (v*) on HEAD"
+	exit 50
+fi
+
+
+declare publish_version
+publish_version="v$(jq -r '."version"' -- "$package_json_file_path")"
+readonly publish_version
+
+if [ "$publish_version" != "$tag_name" ]; then
+	log "$0: Git tag ($tag_name) does not match version in 'package.json' ($publish_version)"
+	exit 51
+fi
+
+# endregion
+
+
+read -r -p 'Ready to publish. Proceed? [y/N] ' ans
+
+case "$ans" in
+	['y''Y']*)
+		vsce package &&
+			vsce publish &&
+			log 'Done.'
+		;;
+	*)
+		log 'Aborted.'
+		exit 32
+		;;
+esac

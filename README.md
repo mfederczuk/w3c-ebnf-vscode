@@ -12,11 +12,11 @@
 
 ## About ##
 
-> VSCode extension for support of W3C's EBNF notation
-
 Adds syntax highlighting support for [W3C's EBNF notation] defined in the XML specification.
 
 [W3C's EBNF notation]: https://www.w3.org/TR/2008/REC-xml-20081126/#sec-notation "Extensible Markup Language (XML) 1.0 (Fifth Edition) - 6 Notation"
+
+![Example](example.png)
 
 ## Contributing ##
 
