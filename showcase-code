@@ -1,0 +1,18 @@
+#!/bin/sh
+# -*- sh -*-
+# vim: set syntax=sh
+# code: language=shellscript
+
+# SPDX-License-Identifier: CC0-1.0
+
+set -o errexit
+
+root_dir_path="$(dirname -- "$0")"
+root_dir_path="$(realpath -s -- "$(dirname "$0")")"
+readonly root_dir_path
+
+code --disable-extensions \
+     --extensionDevelopmentPath="$root_dir_path" \
+     --user-data-dir "$root_dir_path/.showcase-code-user-dir" \
+     -n \
+     "$root_dir_path/example.w3c-ebnf"

@@ -1,0 +1,46 @@
+/*
+ * W3C EBNF example
+ */
+
+Ws  ::= ' ' | #x9
+Eol ::= #xD? #xA | #xD
+
+// region digits & numbers
+
+BinaryDigit ::= [01]
+OctalDigit  ::= [0-7]
+Digit       ::= [0-9]
+HexDigit    ::= Digit | [a-fA-F]
+
+BinaryNumber ::= '0b' BinaryDigit+
+OctalNumber  ::= '0o' OctalDigit+
+DenaryNumber ::= Digit+
+HexNumber    ::= '0x' HexDigit+
+
+Number ::= BinaryNumber
+         | OctalNumber
+         | DenaryNumber
+         | HexNumber
+
+// endregion
+
+BinaryOp ::= [-+*/]
+
+/* region variable */
+
+VariableName        ::= [a-zA-z_][a-zA-z0-9_]* - 'var'
+VariableDeclaration ::= 'var' Ws+ VariableName Ws*           '=' Ws* Expression
+VariableAssignment  ::=           VariableName Ws* BinaryOp? '=' Ws* Expression
+
+/* endregion */
+
+Expression ::= Expression Ws* BinaryOp Ws* Expression
+             | [+-] Ws* Expression
+             | Number
+             | VariableName
+             | '(' Ws* Expression Ws* ')'
+             ; // optional semicolons
+
+Statement ::= Ws* (VariableDeclaration | Expression) Ws* (Eol | EOF) // EOF is a non-standard addition
+
+grammar ::= (Statement)*

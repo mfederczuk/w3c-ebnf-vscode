@@ -18,6 +18,8 @@ Adds syntax highlighting support for [W3C's EBNF notation] defined in the XML sp
 
 [W3C's EBNF notation]: https://www.w3.org/TR/2008/REC-xml-20081126/#sec-notation "Extensible Markup Language (XML) 1.0 (Fifth Edition) - 6 Notation"
 
+![Example](example.png)
+
 ## Contributing ##
 
 Read through the [Contribution Guidelines](CONTRIBUTING.md) if you want to contribute to this project.
