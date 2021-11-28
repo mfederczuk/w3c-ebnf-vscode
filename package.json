@@ -1,7 +1,7 @@
 {
 	"name": "w3c-ebnf",
 	"displayName": "W3C EBNF",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"publisher": "mfederczuk",
 	"description": "Language support for W3C's EBNF notation",
 	"categories": [
