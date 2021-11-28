@@ -17,6 +17,7 @@ and this project adheres to [**Semantic Versioning v2.0.0**](https://semver.org/
 
 * Snippets
 * `EOF` constant
+* the `grammar`/`document` variable is now specially recognized
 
 ### Fixed ###
 
