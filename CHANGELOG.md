@@ -13,6 +13,10 @@ and this project adheres to [**Semantic Versioning v2.0.0**](https://semver.org/
 
 ## Unreleased ##
 
+### Added ###
+
+* Snippets
+
 ### Fixed ###
 
 * Allowed **ASCII** digits inside rule names (leading digits are still not allowed)

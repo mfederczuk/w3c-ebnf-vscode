@@ -1,0 +1,102 @@
+/*
+ * Some rule definitions are copied from the XML 1.0 (fifth edition) specification document;
+ *
+ * Copyright (c) 2015 W3C(R) (MIT, ERCIM, Keio, Beihang). This software or document includes material copied from or derived from Extensible Markup Language (XML) 1.0 (Fifth Edition) <https://www.w3.org/TR/2008/REC-xml-20081126/>.
+ * Copyright (c) 2008 World Wide Web Consortium, (MIT, ERCIM, Keio, Beihang). http://www.w3.org/Consortium/Legal/2015/doc-license
+ *
+ * The rest of this file is licensed under: SPDX-License-Identifier: CC0-1.0
+ */
+
+{
+	"Null Escape Character": {
+		"scope": "w3c-ebnf",
+		"prefix": ["\\0", "null"],
+		"body": "#x0",
+		"description": "Inserts the escape sequence for the ASCII Null character"
+	},
+	"Horizontal Tab Escape Character": {
+		"scope": "w3c-ebnf",
+		"prefix": ["\\t", "horizontal_tab", "tab"],
+		"body": "#x9",
+		"description": "Inserts the escape sequence for the ASCII Horizontal Tab character"
+	},
+	"Newline Escape Character": {
+		"scope": "w3c-ebnf",
+		"prefix": ["\\n", "newline"],
+		"body": "#xA",
+		"description": "Inserts the escape sequence for the ASCII Newline character"
+	},
+	"Carriage Return Escape Character": {
+		"scope": "w3c-ebnf",
+		"prefix": ["\\r", "carriage_return"],
+		"body": "#xD",
+		"description": "Inserts the escape sequence for the ASCII Carriage Return character"
+	},
+
+	"Rule Template": {
+		"scope": "w3c-ebnf",
+		"prefix": "rule",
+		"body": "${1:Name} ::= ${2:expression}",
+		"description": "Inserts a basic template for a rule"
+	},
+
+	"Binary Digits Rule": {
+		"scope": "w3c-ebnf",
+		"prefix": "binary_digits",
+		"body": "${1:BinaryDigits} ::= [01]",
+		"description": "Inserts a rule for base-2 digits"
+	},
+	"Octal Digits Rule": {
+		"scope": "w3c-ebnf",
+		"prefix": "octal_digits",
+		"body": "${1:OctalDigits} ::= [0-7]",
+		"description": "Inserts a rule for base-8 digits"
+	},
+	"Decimal/Denary Digits Rule": {
+		"scope": "w3c-ebnf",
+		"prefix": ["denary_digits", "decimal_digits", "digits"],
+		"body": "${1:Digits} ::= [0-9]",
+		"description": "Inserts a rule for base-10 digits"
+	},
+	"Hexadecimal Digits Rule": {
+		"scope": "w3c-ebnf",
+		"prefix": "hex_digits",
+		"body": "${1:HexDigits} ::= [0-9a-fA-F]",
+		"description": "Inserts a rule for base-16 digits"
+	},
+
+	"End of Line Rule": {
+		"scope": "w3c-ebnf",
+		"prefix": "eol",
+		"body": "${1:Eol} ::= #xD? #xA | #xD",
+		"description": "Inserts a rule for and end of line"
+	},
+
+	"ASCII Character Rule": {
+		"scope": "w3c-ebnf",
+		"prefix": "ascii_char",
+		"body": "${1:Char} ::= [#x0-#x7F]",
+		"description": "Inserts a rule for any ASCII character"
+	},
+	"ASCII Control Character Rule": {
+		"scope": "w3c-ebnf",
+		"prefix": "ascii_control",
+		"body": "${1:AsciiControlChar} ::= [#x0-#x1F] | #x7F",
+		"description": "Inserts a rule for any ASCII control character (includes whitespace characters and the 0x7F delete character)"
+	},
+	"ASCII Whitespace Character Rule": {
+		"scope": "w3c-ebnf",
+		"prefix": ["ascii_whitespace", "whitespace"],
+		// copied from the XML spec with tiny changes; changed #x20 to ' ' and removed the parenthesis and the trailing +
+		"body": "${1:S} ::= ' ' | #x9 | #xA | #xD",
+		"description": "Inserts a rule for any ASCII whitespace character"
+	},
+
+	"Unicode Character Rule": {
+		"scope": "w3c-ebnf",
+		"prefix": "unicode_char",
+		// copied 1:1 from the XML spec
+		"body": "${1:Char} ::= #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF] /* any Unicode character, excluding the surrogate blocks, FFFE, and FFFF. */",
+		"description": "Inserts a rule for any Unicode character, excluding some ASCII control characters and Unicode surrogate blocks"
+	}
+}
