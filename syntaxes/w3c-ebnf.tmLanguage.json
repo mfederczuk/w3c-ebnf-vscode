@@ -27,7 +27,18 @@
 			"begin": "^\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*(::=)\\s*",
 			"end": "(;)|(?=^\\s*[a-zA-Z_][a-zA-Z0-9_]*\\s*::=)",
 			"beginCaptures": {
-				"1": { "name": "variable.other.w3c-ebnf" },
+				"1": {
+					"patterns": [
+						{
+							"name": "invalid.illegal.w3c-ebnf",
+							"match": "\\bEOF\\b"
+						},
+						{
+							"name": "variable.other.w3c-ebnf",
+							"match": ".*"
+						}
+					]
+				},
 				"2": { "name": "keyword.operator.new.w3c-ebnf" }
 			},
 			"endCaptures": {
@@ -147,6 +158,10 @@
 					"patterns": [
 						{ "include": "#expression" }
 					]
+				},
+				{
+					"name": "constant.language.w3e-ebnf",
+					"match": "\\bEOF\\b"
 				},
 				{
 					"name": "variable.other.w3c-ebnf",
