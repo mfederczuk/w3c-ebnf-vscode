@@ -3,16 +3,86 @@
 # vim: set syntax=sh
 # code: language=shellscript
 
-# SPDX-License-Identifier: CC0-1.0
+# Copyright (c) 2022 Michael Federczuk
+# SPDX-License-Identifier: MPL-2.0 AND Apache-2.0
 
 set -o errexit
+set -o nounset
 
-root_dir_path="$(dirname -- "$0")"
-root_dir_path="$(realpath -s -- "$(dirname "$0")")"
+# enabling POSIX-compliant behavior for GNU programs
+export POSIXLY_CORRECT=yes POSIX_ME_HARDER=yes
+
+command_exists() {
+	command -v "$1" > '/dev/null'
+}
+
+if ! command_exists realpath; then
+	echo "$0: realpath: program missing" >&2
+	exit 27
+fi
+
+code_available=$(if command_exists code; then echo true; else echo false; fi)
+readonly code_available
+
+codium_available=$(if command_exists codium; then echo true; else echo false; fi)
+readonly codium_available
+
+case $code_available,$codium_available in
+	('false,false')
+		echo "$0: no VSCode command found" >&2
+		exit 48
+		;;
+	('true,false')
+		readonly vscode_cmd=code
+		;;
+	('false,true')
+		readonly vscode_cmd=codium
+		;;
+	('true,true')
+		{
+			echo "Both 'code' and 'codium' commands found."
+			printf 'Please enter the desired VSCode command: '
+		} >&2
+
+		read -r vscode_cmd
+
+		if ! printf '%s' "$vscode_cmd" | grep -Eq '^(code|codium)([[:space:]]+[^[:space:]].*)?$'; then
+			printf "The command '%s' does not seem to be a VSCode command. Continue? [y/N] " "$vscode_cmd" >&2
+
+			read -r ans
+
+			case "$ans" in
+				(['yY']*)
+					# continue
+					;;
+				(*)
+					echo 'Aborting.' >&2
+					exit 32
+					;;
+			esac
+
+			unset -v ans
+		fi
+
+		readonly vscode_cmd
+		;;
+esac
+
+root_dir_path="$(realpath -- "$0")"
+root_dir_path="$(dirname "$root_dir_path")"
+root_dir_path="$(realpath -s --relative-to=. -- "$root_dir_path")"
 readonly root_dir_path
 
-code --disable-extensions \
-     --extensionDevelopmentPath="$root_dir_path" \
-     --user-data-dir "$root_dir_path/.showcase-code-user-dir" \
-     -n \
-     "$root_dir_path/example.w3c-ebnf"
+user_data_dir_path="$root_dir_path/.showcase-code-user-dir"
+user_data_dir_path="$(realpath -s --relative-to=. "$user_data_dir_path")"
+readonly user_data_dir_path
+
+example_file_path="$root_dir_path/example.w3c-ebnf"
+example_file_path="$(realpath -s --relative-to=. "$example_file_path")"
+readonly example_file_path
+
+$vscode_cmd --disable-extensions \
+            --extensionDevelopmentPath="$root_dir_path" \
+            --user-data-dir="$user_data_dir_path" \
+            -n \
+            "$example_file_path"

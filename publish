@@ -3,68 +3,132 @@
 # vim: set syntax=sh
 # code: language=shellscript
 
+# Copyright (c) 2022 Michael Federczuk
 # SPDX-License-Identifier: MPL-2.0 AND Apache-2.0
 
 set -o errexit
+set -o nounset
 
+# enabling POSIX-compliant behavior for GNU programs
+export POSIXLY_CORRECT=yes POSIX_ME_HARDER=yes
 
 log() {
 	echo "$@" >&2
 }
 
+command_exists() {
+	command -v "$1" > '/dev/null'
+}
 
-# region testing for required programs
+assert_program_exists() {
+	local program
 
-declare program
-
-for program in vsce jq git; do
-	if ! command -v "$program" > '/dev/null'; then
-		log "$0: $program: program missing"
-		exit 27
-	fi
-done
-
-unset -v program
-
-# endregion
-
-
-declare root_dir_path
-root_dir_path="$(dirname -- "$0")"
-root_dir_path="$(realpath --relative-to=. -s -- "$root_dir_path")"
-readonly root_dir_path
-
-declare package_json_file_path
-package_json_file_path="$(realpath --relative-to=. -s -- "$root_dir_path/package.json")"
-readonly package_json_file_path
-
-declare publisher
-publisher="$(jq -r '."publisher"' -- "$package_json_file_path")"
-readonly publisher
+	for program in "$@"; do
+		if ! command_exists "$program"; then
+			log "$0: $program: program missing"
+			exit 27
+		fi
+	done
+}
 
 
-# region checking if the correct publisher is logged in
+assert_program_exists vsce jq git
 
-declare publisher_logged_in=false
 
-declare logged_in_publisher
-while read -r logged_in_publisher; do
-	if [ "$logged_in_publisher" = "$publisher" ]; then
-		publisher_logged_in=true
-		break
-	fi
-done < <(vsce ls-publishers)
-unset -v logged_in_publisher
+#region prompt for target marketplace
 
-if ! $publisher_logged_in; then
-	log "$0: publisher '$publisher' is not logged in"
-	exit 48
+readonly enum_marketplace_msvs='msvs' \
+         enum_marketplace_openvsx='openvsx'
+
+declare target_marketplace
+
+{
+	echo 'To which marketplace/registry do you want to publish to?'
+	echo ' 1) Microsoft Visual Studio Marketplace'
+	echo ' 2) Eclipse Open VSX Registry'
+} >&2
+read -r -p '> ' ans
+
+case "$ans" in
+	(1)
+		target_marketplace="$enum_marketplace_msvs"
+		log 'Targetting the Microsoft Visual Studio Marketplace.'
+		;;
+	(2)
+		target_marketplace="$enum_marketplace_openvsx"
+		log "Targetting Eclipse's Open VSX Registry."
+		;;
+	(*)
+		if [ -z "$ans" ]; then
+			log "Empty answer. Aborting."
+		else
+			log "Invalid choice '$ans'. Aborting."
+		fi
+		exit 32
+		;;
+esac
+
+unset -v ans
+
+readonly target_marketplace
+
+log
+
+#endregion
+
+if [ "$target_marketplace" = "$enum_marketplace_openvsx" ]; then
+	assert_program_exists ovsx
 fi
 
-unset -v publisher_logged_in
+# region read information from package.json
+
+declare root_dir_path
+root_dir_path="$(realpath -- "$0")"
+root_dir_path="$(dirname "$root_dir_path")"
+root_dir_path="$(realpath -s --relative-to=. -- "$root_dir_path")"
+readonly root_dir_path
+
+declare package_json_file_path="$root_dir_path/package.json"
+package_json_file_path="$(realpath -s --relative-to=. -- "$package_json_file_path")"
+readonly package_json_file_path
+
+declare package_name
+package_name="$(jq -r '."name"' -- "$package_json_file_path")"
+readonly package_name
+
+declare package_version
+package_version="$(jq -r '."version"' -- "$package_json_file_path")"
+readonly package_version
+
+declare package_publisher
+package_publisher="$(jq -r '."publisher"' -- "$package_json_file_path")"
+readonly package_publisher
 
 # endregion
 
+# region checking if the correct publisher is logged in (MS VS Marketplace-only)
+
+if [ "$target_marketplace" = "$enum_marketplace_msvs" ]; then
+	declare publisher_logged_in=false
+
+	declare logged_in_publisher
+	while read -r logged_in_publisher; do
+		if [ "$logged_in_publisher" = "$package_publisher" ]; then
+			publisher_logged_in=true
+			break
+		fi
+	done < <(vsce ls-publishers)
+	unset -v logged_in_publisher
+
+	if ! $publisher_logged_in; then
+		log "$0: publisher '$package_publisher' is not logged in"
+		exit 48
+	fi
+
+	unset -v publisher_logged_in
+fi
+
+# endregion
 
 # region checking for dirty worktree
 
@@ -94,7 +158,7 @@ while read -r; do
 			log "'$file_path' has been changed in some way"
 			;;
 	esac
-done < <(xargs git status --untracked-files=all --ignored=matching --porcelain=v1 -- < <(vsce ls))
+done < <(xargs git --no-pager status --untracked-files=all --ignored=matching --porcelain=v1 -- < <(vsce ls))
 unset -v REPLY file_path
 
 
@@ -103,13 +167,14 @@ if $dirty; then
 	exit 49
 fi
 
-# endregion
+unset -v dirty
 
+# endregion
 
 # region checking git tag and package.json version
 
 declare tag_name
-tag_name=$(git name-rev --tags --refs='v*' --name-only -- HEAD)
+tag_name=$(git --no-pager name-rev --tags --refs='v*' --name-only -- HEAD)
 readonly tag_name
 
 if [ "$tag_name" = 'undefined' ]; then
@@ -117,29 +182,81 @@ if [ "$tag_name" = 'undefined' ]; then
 	exit 50
 fi
 
-
-declare publish_version
-publish_version="v$(jq -r '."version"' -- "$package_json_file_path")"
-readonly publish_version
-
-if [ "$publish_version" != "$tag_name" ]; then
-	log "$0: Git tag ($tag_name) does not match version in 'package.json' ($publish_version)"
+if [ "v$package_version" != "$tag_name" ]; then
+	log "$0: Git tag ($tag_name) does not match version in 'package.json' (v$package_version)"
 	exit 51
 fi
 
 # endregion
 
+# region publishing
+
+if [ "$target_marketplace" = "$enum_marketplace_openvsx" ]; then
+	read -rs -p 'Please enter your Open VSX public access token (PAT): ' openvsx_pat
+	readonly openvsx_pat
+
+	log # newline because read -s
+
+	if command_exists uuidparse; then
+		if uuidparse --noheadings --output VARIANT,TYPE,TIME --raw "$openvsx_pat" | grep -Eq '(^| )invalid( |$)'; then
+			read -r -p 'The entered PAT is not a valid UUID. Continue anyway? [y/N] ' ans
+
+			case "$ans" in
+				(['yY']*)
+					# continue
+					;;
+				(*)
+					log 'Aborting.'
+					exit 33
+					;;
+			esac
+
+			unset -v ans
+		fi
+	else
+		log "Command 'uuidparse' not found, cannot validate PAT."
+	fi
+
+	log
+fi
+
 
 read -r -p 'Ready to publish. Proceed? [y/N] ' ans
 
 case "$ans" in
-	['y''Y']*)
-		vsce package &&
-			vsce publish &&
-			log 'Done.'
+	(['yY']*)
+		# continue
 		;;
-	*)
+	(*)
 		log 'Aborted.'
 		exit 32
 		;;
 esac
+
+unset -v ans
+
+
+case "$target_marketplace" in
+	("$enum_marketplace_msvs")
+		vsce package
+		vsce publish
+		;;
+	("$enum_marketplace_openvsx")
+		declare vsix_file_path="$root_dir_path/$package_name-$package_version.vsix"
+		vsix_file_path="$(realpath -s --relative-to=. -- "$vsix_file_path")"
+		readonly vsix_file_path
+
+		vsce package
+
+		if [ ! -e "$vsix_file_path" ]; then
+			log "Expected the final VSIX file to be located under '$vsix_file_path', but was wrong. Publishing needs to be completed manually. Aborting."
+			exit 52
+		fi
+
+		ovsx --pat "$openvsx_pat" publish "$vsix_file_path"
+		;;
+esac
+
+log 'Done.'
+
+# endregion
